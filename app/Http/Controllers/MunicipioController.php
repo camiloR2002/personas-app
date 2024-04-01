@@ -1,9 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Municipio;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 class MunicipioController extends Controller
 {
     /**
@@ -13,7 +13,11 @@ class MunicipioController extends Controller
      */
     public function index()
     {
-        //
+        $municipios = DB::table('tb_municipio')
+            ->join('tb_municipio', 'tb_comuna.muni_codi', '=', 'tb_municipio.muni_codi')
+            ->select('tb_municipio.*', "tb_municipio.muni_nomb")
+            ->get();
+        return view('municipio.index', ['municipios' => $municipios]);
     }
 
     /**
