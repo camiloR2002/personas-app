@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pais;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PaisController extends Controller
 {
@@ -13,8 +15,16 @@ class PaisController extends Controller
      */
     public function index()
     {
-        //
+        $paises = DB::table('tb_pais')
+            ->select('pais_codi', 'pais_nomb', 'pais_capi')
+            ->get();
+        
+        return view('pais.index', ['paises' => $paises]);
     }
+    
+
+    
+    
 
     /**
      * Show the form for creating a new resource.
@@ -23,7 +33,10 @@ class PaisController extends Controller
      */
     public function create()
     {
-        //
+       $paises =DB::table('tb_pais')
+       ->orderBy('pais_nomb')
+       ->get();
+       return view('pais.new',['paises'=>$paises]);
     }
 
     /**
@@ -33,9 +46,22 @@ class PaisController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        //
-    }
+{
+    $pais = new Pais();
+    
+    $pais->pais_nomb = $request->name;
+    $pais->pais_capi = $request->code;
+    $pais->save();
+
+    $paises = DB::table('tb_pais')
+                ->select('pais_codi', 'pais_nomb', 'pais_capi')
+                ->get();
+
+    return view('pais.index', ['paises' => $paises]);
+}
+
+        
+    
 
     /**
      * Display the specified resource.
@@ -56,7 +82,11 @@ class PaisController extends Controller
      */
     public function edit($id)
     {
-        //
+        $pais = Pais::find($id);
+    $paises = DB::table('tb_pais')
+        ->orderBy('pais_codi')
+        ->get();
+    return view('pais.edit', ['pais' => $pais, 'paises' => $paises]);
     }
 
     /**
@@ -68,7 +98,18 @@ class PaisController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $pais = Pais::find($id);
+        $pais->pais_codi=$request->code;
+        $pais->pais_nomb=$request->name;
+        $pais->pais_capi=$request->code;
+        $pais->save();
+
+        $paises = DB::table('tb_pais')
+        
+        ->select('pais_codi', 'pais_nomb', 'pais_capi')
+        ->get();
+    
+    return view('pais.index', ['paises' => $paises]);
     }
 
     /**
@@ -79,6 +120,13 @@ class PaisController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $pais = Pais::find($id);
+        $pais->delete();
+
+        $paises = DB::table('tb_pais')
+        ->select('pais_codi', 'pais_nomb', 'pais_capi')
+        ->get();
+    
+    return view('pais.index', ['paises' => $paises]);
     }
 }
