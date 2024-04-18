@@ -15,118 +15,61 @@ class PaisController extends Controller
      */
     public function index()
     {
-        $paises = DB::table('tb_pais')
-            ->select('pais_codi', 'pais_nomb', 'pais_capi')
-            ->get();
-        
+        $paises = Pais::all();
         return view('pais.index', ['paises' => $paises]);
     }
-    
 
-    
-    
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
-    {
-       $paises =DB::table('tb_pais')
-       ->orderBy('pais_nomb')
-       ->get();
-       return view('pais.new',['paises'=>$paises]);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
 {
-    $pais = new Pais();
-    
-    $pais->pais_nomb = $request->name;
-    $pais->pais_capi = $request->code;
-    $pais->save();
-
-    $paises = DB::table('tb_pais')
-                ->select('pais_codi', 'pais_nomb', 'pais_capi')
-                ->get();
-
-    return view('pais.index', ['paises' => $paises]);
+    $paises = Pais::all(); 
+    return view('pais.create', ['paises' => $paises]);
 }
 
-        
+public function store(Request $request)
+{
+    $request->validate([
+        'pais_nomb' => 'required',
+        'pais_codi' => 'required|unique:tb_pais', 
+        'pais_capi' => 'required',
+]);
+
+
+    $pais = new Pais();
+    $pais->pais_codi = $request->pais_codi;
+    $pais->pais_nomb = $request->pais_nomb;
+    $pais->pais_capi = $request->pais_capi;
+    $pais->save();
+
     
+    return redirect()->route('paises.index')->with('success', 'País añadido exitosamente.');
+}
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         $pais = Pais::find($id);
-    $paises = DB::table('tb_pais')
-        ->orderBy('pais_codi')
-        ->get();
-    return view('pais.edit', ['pais' => $pais, 'paises' => $paises]);
+        $paises = DB::table('tb_pais')->orderBy('pais_nomb')->get();
+        return view('pais.edit', ['pais' => $pais, 'paises' => $paises]);
     }
+    
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        $pais = Pais::find($id);
-        $pais->pais_codi=$request->code;
-        $pais->pais_nomb=$request->name;
-        $pais->pais_capi=$request->code;
+        $pais = Pais::findOrFail($id);
+        $pais->pais_codi = $request->pais_codi;
+        $pais->pais_nomb = $request->pais_nomb;
+        $pais->pais_capi = $request->pais_capi;
         $pais->save();
 
-        $paises = DB::table('tb_pais')
-        
-        ->select('pais_codi', 'pais_nomb', 'pais_capi')
-        ->get();
-    
-    return view('pais.index', ['paises' => $paises]);
+        return redirect()->route('paises.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        $pais = Pais::find($id);
+        $pais = Pais::findOrFail($id);
         $pais->delete();
 
-        $paises = DB::table('tb_pais')
-        ->select('pais_codi', 'pais_nomb', 'pais_capi')
-        ->get();
-    
-    return view('pais.index', ['paises' => $paises]);
+        return redirect()->route('paises.index');
     }
 }
+
+
